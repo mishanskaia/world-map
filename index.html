@@ -454,6 +454,7 @@ function countryCard(k,{inline=false}={}){const c=C[k];if(!c)return '';
   else h+=`<div class="cc-top" style="padding-right:0">${flagImg(k,'fl lg')}<div><p>${esc(c.sub||'')}</p></div></div>`;
   if(facts.length)h+=`<dl class="facts">${facts.map(([a,b])=>`<dt>${a}</dt><dd>${b}</dd>`).join('')}</dl>`;
   if(c.tip)h+=`<div class="tipbox">${ICON.bulb}<span>${esc(c.tip)}</span></div>`;
+  h+=moreBlock((window.MORE_C||{})[k]);
   if(c.nb&&c.nb.length)h+=`<div class="lbl">${c.nb.length} ${plural(c.nb.length,'сосед','соседа','соседей')} по суше</div><div class="chips">${c.nb.map(n=>`<button class="chip" data-country="${esc(n)}">${flagImg(n,'fl','')}${esc(C[n].n)}</button>`).join('')}</div>`;
   else if(c.land===false&&c.k!=='Antarctica')h+=`<div class="lbl">Сухопутных соседей нет</div>`;
   if(!inline&&c.les&&current.view!=='lesson')h+=`<button class="linkbtn" data-lesson="${c.les}">Открыть урок ${c.les}: ${esc(LESSON(c.les).title)}</button>`;
@@ -565,13 +566,13 @@ function renderLearn(l){const L=l.id,n=itemsOf(L),s=studiedOf(L);const tb=$('#ta
     sheet.hidden=true;if(open){clearMap();return}
     b.setAttribute('aria-expanded','true');const d=b.nextElementSibling;d.hidden=false;
     if(g.kind==='country')d.innerHTML=countryCard(it.c,{inline:true});
-    else if(g.kind==='set')d.innerHTML=`<p>${esc(it.d)}</p><div class="chips">${it.cs.filter(k=>C[k]).map(k=>`<button class="chip" data-country="${esc(k)}">${flagImg(k,'fl','')}${esc(C[k].n)}</button>`).join('')}</div>${moreBlock(it.n)}`;
-    else d.innerHTML=`<p>${esc(it.d)}</p>${moreBlock(it.n)}`;
+    else if(g.kind==='set')d.innerHTML=`<p>${esc(it.d)}</p><div class="chips">${it.cs.filter(k=>C[k]).map(k=>`<button class="chip" data-country="${esc(k)}">${flagImg(k,'fl','')}${esc(C[k].n)}</button>`).join('')}</div>${moreBlock((window.MORE||{})[it.n])}`;
+    else d.innerHTML=`<p>${esc(it.d)}</p>${moreBlock((window.MORE||{})[it.n])}`;
     showItem(g.kind,it);
     const key=`${L}:${b.dataset.g}:${b.dataset.i}`;if(!S.studied[key]){S.studied[key]=1;save();b.classList.add('done');const s2=studiedOf(L);$('#stc').textContent=`Изучено ${s2} из ${n}`;$('#stm').style.width=s2/n*100+'%';if(s2===n)toast('Все объекты урока изучены')}
     if(g.kind==='country')markKnown(it.c);
     if(isMobile()){const y=b.getBoundingClientRect().top+scrollY-$('.mapcol').offsetHeight-8;scrollTo({top:y,behavior:reduce?'auto':'smooth'})}})}
-function moreBlock(n){const m=window.MORE&&window.MORE[n];if(!m)return'';
+function moreBlock(m){if(!m)return'';
   return `<details class="more"><summary><span class="lbl-o">Узнать подробнее</span><span class="lbl-c">Свернуть</span></summary><div class="morebox">${m.w?`<h4>Почему это важно</h4><p>${esc(m.w)}</p>`:''}${m.f&&m.f.length?`<h4>Интересные факты</h4><ul>${m.f.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}</div></details>`}
 function showItem(kind,it,{label=true}={}){clearMap();
   if(kind==='point'){addPin(it.xy,label?it.n:null);fitBox(ptBox(it.xy),0,isMobile()?200:260);if(label)caption(esc(it.n),true)}
